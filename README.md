@@ -23,10 +23,10 @@ A modern browser extension to save and organize open tabs into AI-summarized wor
 ## Screenshots
 
 ### Main Popup Interface
-![Popup Interface](https://source.unsplash.com/featured/?ui,design)
+![Popup Interface](./start.png)
 
 ### Workspace Overview
-![Workspace Overview](https://source.unsplash.com/featured/?workspace,technology)
+![Workspace Overview](./workspace.png)
 
 ## Installation
 
