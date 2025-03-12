@@ -33,7 +33,7 @@ A modern browser extension to save and organize open tabs into AI-summarized wor
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your_username/TabRecall.git
+   git clone https://github.com/sonisumit7904/TabRecall.git
    cd TabRecall
    ```
 
