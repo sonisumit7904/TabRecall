@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TabRecall</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container modern-container">
+    <header>
+      <h1>Tab Workspace</h1>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="save-workspace">
+          Save Workspace
+        </button>
+        <button class="tab-btn" data-tab="workspaces-list">
+          My Workspaces
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section id="save-workspace" class="tab-content active">
+        <div class="workspace-form">
+          <div class="input-group">
+            <label for="workspace-name">Workspace Name</label>
+            <input type="text" id="workspace-name" placeholder="Enter workspace name (optional)">
+          </div>
+          <div class="tabs-preview">
+            <h3>Current Tabs</h3>
+            <div id="tabs-list" class="tabs-list">
+              <!-- Tabs will be inserted here -->
+            </div>
+          </div>
+          <button id="save-btn" class="primary-btn">
+            Save Workspace
+          </button>
+        </div>
+      </section>
+
+      <section id="workspaces-list" class="tab-content">
+        <div class="search-bar">
+          <input type="text" id="search-workspaces" placeholder="Search workspaces...">
+        </div>
+        <div id="workspaces-container">
+          <!-- Workspaces will be inserted here -->
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="feather-icons.min.js"></script>
+  <script src="iconLoader.js"></script>
+  <script src="popup.js" type="module"></script>
+</body>
+</html>
