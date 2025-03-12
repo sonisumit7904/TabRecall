@@ -72,7 +72,6 @@ A modern browser extension to save and organize open tabs into AI-summarized wor
 
 ```
 e:\COURSE\WORKSPACE-AI\
-├── .bolt/
 ├── .env
 ├── background.js
 ├── contentScript.js
