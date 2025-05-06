@@ -5,8 +5,7 @@ A modern browser extension to save and organize open tabs into AI-summarized wor
 ## Table of Contents
 - [Features](#features)
 - [Screenshots](#screenshots)
-- [Installation](#installation)
-- [Usage](#usage)
+- [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
 - [Configuration](#configuration)
 - [Credits](#credits)
@@ -28,8 +27,20 @@ A modern browser extension to save and organize open tabs into AI-summarized wor
 ### Workspace Overview
 ![Workspace Overview](./workspace.png)
 
-## Installation
+## Getting Started
 
+### For End Users
+1. **Download Extension:**  
+   Download the zip file for TabRecall.
+2. **Extract Files:**  
+   Extract the downloaded zip file to your preferred location.
+3. **Load the Extension in Chrome:**  
+   - Open Chrome and navigate to `chrome://extensions`
+   - Enable **Developer mode** by toggling the switch at the top right.
+   - Click on the **Load unpacked** button.
+   - Select the folder where you extracted the extension files (typically the `dist` folder after building).
+
+### For Developers
 1. **Clone the repository:**
 
    ```bash
@@ -45,7 +56,7 @@ A modern browser extension to save and organize open tabs into AI-summarized wor
 
 3. **Set up environment variables:**
 
-   Create a `.env` file at the root (already provided in this project) with your Hugging Face API Key, for example:
+   Create a `.env` file at the root with your Hugging Face API Key, for example:
    ```
    VITE_HUGGINGFACE_API_KEY="your_huggingface_api_key_here"
    ```
@@ -65,8 +76,10 @@ A modern browser extension to save and organize open tabs into AI-summarized wor
 ## Usage
 
 - **During Development:** Use the Vite development server to test your changes.
-- **Chrome Extension:** Load the extension in Chrome via `chrome://extensions` in developer mode by selecting the `dist` folder after building.
-- **Workspace Actions:** Save your current browsing session as a workspace, get AI-generated summaries, and manage workspaces with an intuitive UI.
+- **Chrome Extension:**  
+  After building, load the extension in Chrome via `chrome://extensions` in developer mode by selecting the `dist` folder.
+- **Workspace Actions:**  
+  Save your current browsing session as a workspace, get AI-generated summaries, and manage workspaces with an intuitive UI.
 
 ## Project Structure
 
