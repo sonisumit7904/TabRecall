@@ -303,8 +303,16 @@ function createWorkspaceElement(workspace) {
       }" alt="" class="tab-favicon">
       <div class="tab-details">
         <div class="tab-title">${tab.title}</div>
+        <!-- you can add more info here -->
       </div>
     `;
+    // make it look clickable
+    tabItem.style.cursor = "pointer";
+    // add click handler to open just this tab
+    tabItem.addEventListener("click", () => {
+      showToast(`Opening tab “${tab.title}”…`, "default");
+      chrome.tabs.create({ url: tab.url });
+    });
     tabsList.appendChild(tabItem);
   });
 
