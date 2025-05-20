@@ -83,6 +83,11 @@ h1 {
   font-weight: 600; /* Bolder active tab */
   border-bottom: 2px solid var(--primary-color);
 }
+.tab-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  /* Tabs are rectangular, so a rectangular shadow is appropriate */
+}
 
 .tab-content {
   display: none;
@@ -215,6 +220,10 @@ input[type="text"]:focus {
 .primary-btn:active {
   transform: scale(0.98); /* Click effect */
 }
+.primary-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
 
 .search-bar {
   margin-bottom: 1.5rem;
@@ -263,6 +272,11 @@ input[type="text"]:focus {
 }
 .workspace-actions button:hover {
   color: var(--primary-color);
+}
+.workspace-actions button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  border-radius: 0.25rem; /* Add rounding for the focus ring on icon buttons */
 }
 .workspace-actions button svg { /* Assuming feather icons or similar */
   width: 18px;
@@ -321,15 +335,11 @@ input[type="text"]:focus {
 .toggle-tabs:hover {
   text-decoration: underline;
 }
-.toggle-tabs svg {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.2s ease;
+.toggle-tabs:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  border-radius: 0.25rem; /* Add rounding for the focus ring */
 }
-.toggle-tabs.open svg {
-    transform: rotate(180deg);
-}
-
 
 .workspace-meta {
   font-size: 0.8rem;
@@ -410,6 +420,11 @@ input[type="text"]:focus {
 }
 .close-modal:hover {
     color: var(--text-color);
+}
+.close-modal:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  border-radius: 0.25rem; /* Add rounding for the focus ring */
 }
 
 .modal p {
@@ -530,6 +545,10 @@ input[type="text"]:focus {
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   border: 1px solid transparent;
+}
+.confirm-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .confirm-btn.cancel {
