@@ -1,23 +1,34 @@
 :root {
-  --primary-color: #2980B9; /* Belize Hole Blue */
-  --primary-hover: #2471A3; /* Darker Belize Hole */
-  --accent-color: #E67E22; /* Carrot Orange */
-  --accent-hover: #D35400; /* Darker Carrot */
+  /* Main color theme inspired by the colorful gradient squares */
+  --primary-color: #3B82F6; /* Bright blue */
+  --primary-hover: #2563EB; /* Darker blue */
+  --accent-color: #F59E0B; /* Amber */
+  --accent-hover: #D97706; /* Darker amber */
+  
+  /* Light theme background */
+  --bg-color: #f8fafc;
+  
+  /* Gradient colors from the image */
+  --gradient-teal: linear-gradient(135deg, #2DD4BF, #06B6D4);
+  --gradient-blue: linear-gradient(135deg, #60A5FA, #3B82F6);
+  --gradient-orange: linear-gradient(135deg, #F59E0B, #FB7185);
+  --gradient-pink: linear-gradient(135deg, #EC4899, #F43F5E);
+  
+  /* Card backgrounds with subtle shadows */
+  --card-bg-color: #FFFFFF;
+  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Text and UI colors */
+  --text-color: #1E293B; /* Slate 800 */
+  --text-secondary-color: #64748B; /* Slate 500 */
+  --border-color: #E2E8F0; /* Slate 200 */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --input-bg-color: #F8FAFC; /* Very light for inputs */
 
-  /* Updated background for more color */
-  --bg-start: #AED6F1;   /* Light Blue - used by body */
-  --bg-end: #A2D9CE;     /* Light Teal - for gradients or alternative */
-
-  --text-color: #2C3E50; /* Midnight Blue (Dark Gray/Blue) */
-  --text-secondary-color: #707B7C; /* Medium Gray */
-  --border-color: #BDC3C7; /* Silver */
-  --shadow-color: rgba(44, 62, 80, 0.15); /* More noticeable shadow */
-  --card-bg-color: #FFFFFF; /* White for cards, contrast with colorful body */
-  --input-bg-color: #FEFEFE; /* Very light, almost white for inputs */
-
-  --success-color: #27AE60; /* Nephritis Green */
-  --error-color: #C0392B;   /* Pomegranate Red */
-  --warning-color: #F39C12; /* Orange (less intense than accent) */
+  /* Status colors */
+  --success-color: #10B981; /* Emerald 500 */
+  --error-color: #EF4444;   /* Red 500 */
+  --warning-color: #F59E0B; /* Amber 500 */
 }
 
 * {
@@ -28,7 +39,7 @@
 
 body {
   /* Updated body background for a cleaner, professional look */
-  background-color: var(--bg-start);
+  background-color: var(--bg-color);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* System font stack */
   color: var(--text-color);
   line-height: 1.6; /* Improved line height for readability */
@@ -557,8 +568,11 @@ input[type="text"]:focus {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   border: 1px solid transparent;
+}
+.confirm-btn:hover {
+  transform: translateY(-1px);
 }
 .confirm-btn:focus-visible {
   outline: none;
@@ -709,4 +723,69 @@ input[type="text"]:focus {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; /* Monospace font stack */
   padding: 0.1rem 0.3rem; /* Small padding for inline code */
   border-radius: 0.25rem;
+}
+
+/* Gradient UI elements inspired by the colorful squares from the image */
+.gradient-element {
+  padding: 1.25rem;
+  border-radius: 1rem;
+  color: white;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.gradient-element:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -3px rgba(0, 0, 0, 0.1), 0 8px 12px -2px rgba(0, 0, 0, 0.05);
+}
+
+.gradient-teal {
+  background: var(--gradient-teal);
+}
+
+.gradient-blue {
+  background: var(--gradient-blue);
+}
+
+.gradient-orange {
+  background: var(--gradient-orange);
+}
+
+.gradient-pink {
+  background: var(--gradient-pink);
+}
+
+/* Gradient buttons */
+.gradient-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.gradient-btn.teal {
+  background: var(--gradient-teal);
+}
+
+.gradient-btn.blue {
+  background: var(--gradient-blue);
+}
+
+.gradient-btn.orange {
+  background: var(--gradient-orange);
+}
+
+.gradient-btn.pink {
+  background: var(--gradient-pink);
 }
