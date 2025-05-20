@@ -1,17 +1,17 @@
 :root {
-  --primary-color: #3B82F6; /* Updated to a slightly more vibrant blue */
-  --primary-hover: #2563EB;
-  --bg-start: #F9FAFB; /* Lighter background start */
-  --bg-end: #F3F4F6;   /* Lighter background end */
-  --text-color: #1F2937;
-  --text-secondary-color: #4B5563; /* Added for less prominent text */
-  --border-color: #D1D5DB; /* Softer border color */
-  --shadow-color: rgba(0, 0, 0, 0.05); /* Softer shadow */
-  --card-bg-color: #FFFFFF;
-  --input-bg-color: #F9FAFB;
-  --success-color: #10B981;
-  --error-color: #EF4444;
-  --warning-color: #F59E0B;
+  --primary-color: #007AFF; /* Professional Blue */
+  --primary-hover: #0056b3; /* Darker blue for hover */
+  --bg-start: #F8F9FA; /* Light gray background start */
+  --bg-end: #EFF2F5;   /* Slightly darker gray background end */
+  --text-color: #212529; /* Dark gray for text, almost black */
+  --text-secondary-color: #6C757D; /* Medium gray for secondary text */
+  --border-color: #DEE2E6; /* Light gray for borders */
+  --shadow-color: rgba(0, 0, 0, 0.08); /* Softer, more subtle shadow */
+  --card-bg-color: #FFFFFF; /* White for card backgrounds */
+  --input-bg-color: #F8F9FA; /* Light gray for input backgrounds */
+  --success-color: #28A745; /* Standard success green */
+  --error-color: #DC3545; /* Standard error red */
+  --warning-color: #FFC107; /* Standard warning yellow */
 }
 
 * {
