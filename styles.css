@@ -1,17 +1,23 @@
 :root {
-  --primary-color: #007AFF; /* Professional Blue */
-  --primary-hover: #0056b3; /* Darker blue for hover */
-  --bg-start: #F8F9FA; /* Light gray background start */
-  --bg-end: #EFF2F5;   /* Slightly darker gray background end */
-  --text-color: #212529; /* Dark gray for text, almost black */
-  --text-secondary-color: #6C757D; /* Medium gray for secondary text */
-  --border-color: #DEE2E6; /* Light gray for borders */
-  --shadow-color: rgba(0, 0, 0, 0.08); /* Softer, more subtle shadow */
-  --card-bg-color: #FFFFFF; /* White for card backgrounds */
-  --input-bg-color: #F8F9FA; /* Light gray for input backgrounds */
-  --success-color: #28A745; /* Standard success green */
-  --error-color: #DC3545; /* Standard error red */
-  --warning-color: #FFC107; /* Standard warning yellow */
+  --primary-color: #2980B9; /* Belize Hole Blue */
+  --primary-hover: #2471A3; /* Darker Belize Hole */
+  --accent-color: #E67E22; /* Carrot Orange */
+  --accent-hover: #D35400; /* Darker Carrot */
+
+  /* Updated background for more color */
+  --bg-start: #AED6F1;   /* Light Blue - used by body */
+  --bg-end: #A2D9CE;     /* Light Teal - for gradients or alternative */
+
+  --text-color: #2C3E50; /* Midnight Blue (Dark Gray/Blue) */
+  --text-secondary-color: #707B7C; /* Medium Gray */
+  --border-color: #BDC3C7; /* Silver */
+  --shadow-color: rgba(44, 62, 80, 0.15); /* More noticeable shadow */
+  --card-bg-color: #FFFFFF; /* White for cards, contrast with colorful body */
+  --input-bg-color: #FEFEFE; /* Very light, almost white for inputs */
+
+  --success-color: #27AE60; /* Nephritis Green */
+  --error-color: #C0392B;   /* Pomegranate Red */
+  --warning-color: #F39C12; /* Orange (less intense than accent) */
 }
 
 * {
@@ -80,12 +86,20 @@ h1 {
 }
 .tab-btn.active {
   color: var(--primary-color);
-  font-weight: 600; /* Bolder active tab */
-  border-bottom: 2px solid var(--primary-color);
+  font-weight: 600;
+  border: 1px solid var(--primary-color); /* Full border */
+  background-color: var(--card-bg-color); /* Match card background */
+  border-bottom: 1px solid var(--card-bg-color); /* Merge with content area */
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  margin-bottom: -1px; /* Overlap .tabs border-bottom */
+  z-index: 1;
+  /* Ensure padding is consistent if it was different, or keep existing if fine */
+  /* padding: 0.75rem 1.5rem; */ /* This is already on .tab-btn */
 }
 .tab-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2); /* Updated focus color */
   /* Tabs are rectangular, so a rectangular shadow is appropriate */
 }
 
@@ -128,7 +142,7 @@ input[type="text"] {
 input[type="text"]:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* Adjusted focus shadow */
+  box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2); /* Updated focus color */
   background-color: var(--card-bg-color); /* Whiter background on focus */
 }
 
@@ -222,7 +236,7 @@ input[type="text"]:focus {
 }
 .primary-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2); /* Updated focus color */
 }
 
 .search-bar {
@@ -275,7 +289,7 @@ input[type="text"]:focus {
 }
 .workspace-actions button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2); /* Updated focus color */
   border-radius: 0.25rem; /* Add rounding for the focus ring on icon buttons */
 }
 .workspace-actions button svg { /* Assuming feather icons or similar */
@@ -337,7 +351,7 @@ input[type="text"]:focus {
 }
 .toggle-tabs:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2); /* Updated focus color */
   border-radius: 0.25rem; /* Add rounding for the focus ring */
 }
 
@@ -423,7 +437,7 @@ input[type="text"]:focus {
 }
 .close-modal:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2); /* Updated focus color */
   border-radius: 0.25rem; /* Add rounding for the focus ring */
 }
 
@@ -548,7 +562,7 @@ input[type="text"]:focus {
 }
 .confirm-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2); /* Updated focus color */
 }
 
 .confirm-btn.cancel {
