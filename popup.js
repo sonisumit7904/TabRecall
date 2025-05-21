@@ -870,10 +870,78 @@ function setupEventListeners() {  // Save workspace with loading state and succe
               );
               await chrome.storage.local.set({ workspaces: updatedWorkspaces });
 
-              showToast(`Tab "${tabToDelete.title}" deleted`, "warning");
-              await loadSavedWorkspaces();
+              // Update the DOM directly
+              const workspaceCardElement = e.target.closest('.workspace-card');
+              if (workspaceCardElement) {
+                const tabItemElement = e.target.closest('.workspace-tab-item');
+                if (tabItemElement) {
+                  tabItemElement.remove();
+                }
+
+                // Update tab count in stats
+                const statsTabCountElement = workspaceCardElement.querySelector('.workspace-stats .workspace-stat-item:first-child');
+                if (statsTabCountElement) {
+                  statsTabCountElement.innerHTML = `📄 ${workspace.tabs.length} tabs`;
+                }
+
+                // Update domain count in stats
+                const uniqueDomains = new Set(
+                  workspace.tabs.map((t) => {
+                    try {
+                      return new URL(t.url).hostname;
+                    } catch {
+                      return "unknown";
+                    }
+                  })
+                );
+                const statsDomainCountElement = workspaceCardElement.querySelector('.workspace-stats .workspace-stat-item:nth-child(2)');
+                if (statsDomainCountElement) {
+                  statsDomainCountElement.innerHTML = `🌐 ${uniqueDomains.size} domains`;
+                }
+
+                // Update meta information
+                const metaElement = workspaceCardElement.querySelector('.workspace-meta');
+                if (metaElement) {
+                  metaElement.textContent = `${workspace.tabs.length} tabs • ${new Date(workspace.created).toLocaleDateString()}`;
+                }
+
+                // Handle toggle button and tabs list if workspace becomes empty
+                const toggleButton = workspaceCardElement.querySelector('.toggle-tabs');
+                const tabsListElement = workspaceCardElement.querySelector('.workspace-tabs');
+
+                if (workspace.tabs.length === 0) {
+                  if (toggleButton) {
+                    toggleButton.style.display = 'none';
+                  }
+                  if (tabsListElement) {
+                    tabsListElement.classList.add('collapsed');
+                    tabsListElement.innerHTML = ''; // Clear content
+                  }
+                } else {
+                  if (toggleButton) {
+                    toggleButton.style.display = '';
+                  }
+                }
+                showToast("Tab deleted successfully!", "success");
+              } else {
+                // Fallback if DOM element not found
+                await loadSavedWorkspaces();
+                showToast("Tab deleted. Workspaces reloaded.", "success");
+              }
             }
           );
+        } else if (e.target.classList.contains("open-workspace")) {
+          const { workspaces = [] } = await chrome.storage.local.get(
+            "workspaces"
+          );
+          const workspace = workspaces.find((w) => w.id === workspaceId);
+
+          if (workspace) {
+            showToast(`Opening ${workspace.name}...`, "default");
+            chrome.windows.create({
+              url: workspace.tabs.map((tab) => tab.url),
+            });
+          }
         }
       }
     });
