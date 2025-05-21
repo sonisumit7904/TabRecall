@@ -33,6 +33,16 @@
   --success-color: #10B981; /* Emerald 500 */
   --error-color: #EF4444;   /* Red 500 */
   --warning-color: #F59E0B; /* Amber 500 */
+    /* Light theme variables (will be applied via .light-theme class) - More colorful, not white */
+  --light-bg-color: #e0e7ff; /* Indigo 100 - light purple/blue base */
+  --light-bg-gradient: linear-gradient(135deg, #e0e7ff, #dbeafe); /* Indigo to blue gradient */
+  --light-card-bg-color: linear-gradient(145deg, #f5f3ff, #ede9fe); /* Purple gradients for cards */
+  --light-card-bg-lighter: linear-gradient(145deg, #ede9fe, #ddd6fe); /* Lighter purple gradient */
+  --light-text-color: #1e293b; /* Slate 800 - dark enough for contrast */
+  --light-text-secondary-color: #4b5563; /* Gray 600 */
+  --light-border-color: #c7d2fe; /* Indigo 200 */
+  --light-shadow-color: rgba(79, 70, 229, 0.12); /* Indigo shadow */
+  --light-input-bg-color: #eef2ff; /* Indigo 50 */
 }
 
 * {
@@ -796,4 +806,150 @@ input[type="text"]:focus {
 
 .gradient-btn.pink {
   background: var(--gradient-pink);
+}
+
+/* Light theme class overrides */
+.light-theme {
+  color: var(--light-text-color);
+  background: var(--light-bg-gradient);
+}
+
+.light-theme .modern-container {
+  background: var(--light-card-bg-color);
+  border-color: rgba(203, 213, 225, 0.4);
+  box-shadow: 0 8px 16px var(--light-shadow-color);
+}
+
+.light-theme .modern-container:hover {
+  box-shadow: 0 12px 24px rgba(14, 165, 233, 0.15);
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+.light-theme h1,
+.light-theme h2,
+.light-theme h3,
+.light-theme h4,
+.light-theme .tab-title {
+  color: var(--light-text-color);
+}
+
+.light-theme .tab-btn {
+  color: var(--light-text-secondary-color);
+}
+
+.light-theme .tab-btn.active {
+  background: var(--light-card-bg-color);
+  border-bottom-color: var(--light-card-bg-color);
+}
+
+.light-theme .tab-summary,
+.light-theme label,
+.light-theme .workspace-summary,
+.light-theme .workspace-tab-item,
+.light-theme .modal p,
+.light-theme .help-details p,
+.light-theme .help-details ul,
+.light-theme .workspace-meta,
+.light-theme .confirm-dialog-message {
+  color: var(--light-text-secondary-color);
+}
+
+.light-theme .tabs,
+.light-theme .tabs-list,
+.light-theme .workspace-tabs,
+.light-theme .workspace-stats {
+  border-color: var(--light-border-color);
+}
+
+.light-theme input[type="text"] {
+  background-color: var(--light-input-bg-color);
+  border-color: var(--light-border-color);
+  color: var(--light-text-color);
+}
+
+.light-theme .tabs-list,
+.light-theme .help-card,
+.light-theme .no-workspaces {
+  background-color: var(--light-input-bg-color);
+  border-color: var(--light-border-color);
+}
+
+.light-theme .tab-item {
+  border-bottom-color: var(--light-border-color);
+}
+
+.light-theme .tab-item:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.light-theme .workspace-card {
+  background: var(--light-card-bg-color);
+  border-color: rgba(203, 213, 225, 0.4);
+  box-shadow: 0 4px 8px var(--light-shadow-color);
+}
+
+.light-theme .workspace-card:hover {
+  box-shadow: 0 6px 12px var(--light-shadow-color);
+}
+
+.light-theme .empty-state {
+  background: var(--light-card-bg-lighter);
+  border-color: var(--light-border-color);
+}
+
+.light-theme .modal,
+.light-theme .confirm-dialog-content {
+  background-color: var(--light-card-bg-color);
+}
+
+.light-theme .help-example {
+  background-color: rgba(59, 130, 246, 0.08);
+}
+
+.light-theme .help-example code {
+  color: var(--light-text-color);
+}
+
+.light-theme .confirm-btn.cancel {
+  background-color: var(--light-input-bg-color);
+  color: var(--light-text-secondary-color);
+  border-color: var(--light-border-color);
+}
+
+/* Theme toggle button styles */
+.theme-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 1.2rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s, transform 0.2s;
+  z-index: 100;
+}
+
+.theme-toggle:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  transform: rotate(15deg);
+}
+
+.light-theme .theme-toggle {
+  color: var(--primary-color);
+}
+
+.light-theme .theme-toggle:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
