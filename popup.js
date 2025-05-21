@@ -60,13 +60,24 @@ function showToast(message, type = "default", duration = 3000) {
   }, duration);
 }
 
+// Helper function to close the confirm dialog
+function closeConfirmDialog(dialogElement) {
+  dialogElement.classList.remove("active");
+  document.body.classList.remove('modal-open'); // Remove class from body
+  setTimeout(() => {
+    if (document.body.contains(dialogElement)) {
+      document.body.removeChild(dialogElement);
+    }
+  }, 300); // Delay to allow fade-out animation
+}
+
 // Show confirmation dialog
 function showConfirmDialog(title, message, onConfirm) {
   const dialog = document.createElement("div");
-  dialog.className = "confirm-dialog";
+  dialog.className = "modal-overlay";
 
   const content = document.createElement("div");
-  content.className = "confirm-dialog-content";
+  content.className = "modal confirm-dialog-content";
 
   const titleEl = document.createElement("div");
   titleEl.className = "confirm-dialog-title";
@@ -82,14 +93,16 @@ function showConfirmDialog(title, message, onConfirm) {
   const cancelBtn = document.createElement("button");
   cancelBtn.className = "confirm-btn cancel";
   cancelBtn.textContent = "Cancel";
-  cancelBtn.onclick = () => document.body.removeChild(dialog);
+  cancelBtn.onclick = () => {
+    closeConfirmDialog(dialog); // Use helper
+  };
 
   const confirmBtn = document.createElement("button");
   confirmBtn.className = "confirm-btn confirm";
-  confirmBtn.textContent = "Delete";
+  confirmBtn.textContent = "Delete"; // Or make this configurable
   confirmBtn.onclick = () => {
     onConfirm();
-    document.body.removeChild(dialog);
+    closeConfirmDialog(dialog); // Use helper
   };
 
   actions.appendChild(cancelBtn);
@@ -101,11 +114,17 @@ function showConfirmDialog(title, message, onConfirm) {
 
   dialog.appendChild(content);
   document.body.appendChild(dialog);
+  document.body.classList.add('modal-open'); // Add class to body
+
+  // Trigger the animation by adding 'active' class after a brief delay
+  setTimeout(() => {
+    dialog.classList.add("active");
+  }, 10);
 
   // Close on background click
   dialog.addEventListener("click", (e) => {
     if (e.target === dialog) {
-      document.body.removeChild(dialog);
+      closeConfirmDialog(dialog); // Use helper
     }
   });
 }
@@ -200,15 +219,31 @@ function showFullSummary(tab) {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+  document.body.classList.add('modal-open'); // Add class to body
+
+  // Trigger the animation by adding 'active' class after a brief delay
+  setTimeout(() => {
+    overlay.classList.add("active");
+  }, 10);
+
+  const closeFullSummaryModal = () => {
+    overlay.classList.remove("active");
+    document.body.classList.remove('modal-open'); // Remove class from body
+    setTimeout(() => {
+      if (document.body.contains(overlay)) {
+        document.body.removeChild(overlay);
+      }
+    }, 300); // Delay for fade-out animation
+  };
 
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) {
-      document.body.removeChild(overlay);
+      closeFullSummaryModal();
     }
   });
 
   modal.querySelector(".close-modal").addEventListener("click", () => {
-    document.body.removeChild(overlay);
+    closeFullSummaryModal();
   });
 }
 
@@ -228,15 +263,31 @@ function showFullWorkspaceSummary(workspace) {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+  document.body.classList.add('modal-open'); // Add class to body
+
+  // Trigger the animation by adding 'active' class after a brief delay
+  setTimeout(() => {
+    overlay.classList.add("active");
+  }, 10);
+
+  const closeFullWorkspaceSummaryModal = () => {
+    overlay.classList.remove("active");
+    document.body.classList.remove('modal-open'); // Remove class from body
+    setTimeout(() => {
+      if (document.body.contains(overlay)) {
+        document.body.removeChild(overlay);
+      }
+    }, 300); // Delay for fade-out animation
+  };
 
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) {
-      document.body.removeChild(overlay);
+      closeFullWorkspaceSummaryModal();
     }
   });
 
   modal.querySelector(".close-modal").addEventListener("click", () => {
-    document.body.removeChild(overlay);
+    closeFullWorkspaceSummaryModal();
   });
 }
 

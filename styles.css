@@ -78,6 +78,17 @@ body {
   border-color: rgba(59, 130, 246, 0.2);
 }
 
+body.modal-open .modern-container {
+  filter: blur(5px);
+  pointer-events: none; /* Prevent interaction with the blurred background */
+}
+
+/* Ensure the modal overlay and its contents are not blurred */
+body.modal-open .modal-overlay {
+  filter: none;
+  pointer-events: auto; /* Allow interaction with the modal */
+}
+
 header {
   margin-bottom: 2rem; /* Increased margin */
   text-align: center; /* Center align header content */
