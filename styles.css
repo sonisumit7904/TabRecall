@@ -178,6 +178,7 @@ input[type="text"] {
   border-radius: 0.5rem; /* Standardized radius */
   font-size: 0.9rem;
   background-color: var(--input-bg-color); /* Subtle background for input */
+  color: #E5E7EB; /* Lighter text color */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
