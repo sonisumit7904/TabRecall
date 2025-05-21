@@ -5,25 +5,29 @@
   --accent-color: #F59E0B; /* Amber */
   --accent-hover: #D97706; /* Darker amber */
   
-  /* Light theme background */
-  --bg-color: #f8fafc;
+  /* Updated dark/gradient background */
+  --bg-color: #111827; /* Dark background */
+  --bg-gradient: linear-gradient(135deg, #0F172A, #1E293B); /* Dark blue gradient */
   
   /* Gradient colors from the image */
   --gradient-teal: linear-gradient(135deg, #2DD4BF, #06B6D4);
   --gradient-blue: linear-gradient(135deg, #60A5FA, #3B82F6);
   --gradient-orange: linear-gradient(135deg, #F59E0B, #FB7185);
   --gradient-pink: linear-gradient(135deg, #EC4899, #F43F5E);
+  --gradient-purple: linear-gradient(135deg, #8B5CF6, #6366F1);
+  --gradient-green: linear-gradient(135deg, #10B981, #34D399);
   
-  /* Card backgrounds with subtle shadows */
-  --card-bg-color: #FFFFFF;
-  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* Card backgrounds with subtle gradients instead of white */
+  --card-bg-color: linear-gradient(145deg, #1F2937, #111827);
+  --card-bg-lighter: linear-gradient(145deg, #374151, #1F2937);
+  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
   
-  /* Text and UI colors */
-  --text-color: #1E293B; /* Slate 800 */
-  --text-secondary-color: #64748B; /* Slate 500 */
-  --border-color: #E2E8F0; /* Slate 200 */
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  --input-bg-color: #F8FAFC; /* Very light for inputs */
+  /* Text and UI colors updated for dark mode */
+  --text-color: #F9FAFB; /* Almost white */
+  --text-secondary-color: #9CA3AF; /* Gray 400 */
+  --border-color: #374151; /* Gray 700 */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --input-bg-color: #1F2937; /* Darker for inputs */
 
   /* Status colors */
   --success-color: #10B981; /* Emerald 500 */
@@ -38,11 +42,12 @@
 }
 
 body {
-  /* Updated body background for a cleaner, professional look */
-  background-color: var(--bg-color);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* System font stack */
+  /* Updated body background to use gradient */
+  background: var(--bg-gradient);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
   color: var(--text-color);
-  line-height: 1.6; /* Improved line height for readability */
+  line-height: 1.6;
+  min-height: 100vh; /* Ensure full height for gradient */
 }
 
 /* Center container in the popup and add a modern card look */
@@ -54,10 +59,13 @@ body {
   padding: 2rem; /* Increased padding */
   margin: 2rem auto;
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Subtle border glow */
+  backdrop-filter: blur(10px); /* Subtle glass effect */
 }
 .modern-container:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08); /* Enhanced hover shadow */
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15); /* Colorful glow on hover */
+  border-color: rgba(59, 130, 246, 0.2);
 }
 
 header {
@@ -255,13 +263,13 @@ input[type="text"]:focus {
 }
 
 .workspace-card {
-  background-color: var(--card-bg-color);
-  border: 1px solid var(--border-color);
+  background: var(--card-bg-color);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.75rem; /* Consistent radius */
   padding: 1.25rem; /* Adjusted padding */
   margin-bottom: 1rem;
   box-shadow: 0 4px 8px var(--shadow-color); /* Softer shadow */
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .workspace-card:hover {
@@ -585,8 +593,8 @@ input[type="text"]:focus {
   border-color: var(--border-color);
 }
 .confirm-btn.cancel:hover {
-  background-color: #E5E7EB; /* Slightly darker hover for cancel */
-  border-color: #9CA3AF;
+  background-color: var(--input-bg-color); /* Slightly darker hover for cancel */
+  border-color: var(--primary-color);
 }
 
 .confirm-btn.confirm {
@@ -608,7 +616,7 @@ input[type="text"]:focus {
 .empty-state {
   text-align: center;
   padding: 2rem;
-  background-color: var(--input-bg-color);
+  background: linear-gradient(145deg, #1F2937, #111827);
   border-radius: 0.75rem;
   border: 1px dashed var(--border-color); /* Dashed border for empty state */
 }
@@ -712,7 +720,7 @@ input[type="text"]:focus {
 .help-example {
   margin-top: 0.75rem;
   padding: 0.75rem;
-  background-color: #E5E7EB; /* Slightly different background for example */
+  background-color: rgba(59, 130, 246, 0.1); /* Subtle blue background for code examples */
   border-radius: 0.5rem;
   font-size: 0.85rem;
 }
