@@ -345,7 +345,7 @@ function createWorkspaceElement(workspace) {
   const tabsList = document.createElement("div");
   tabsList.className = "workspace-tabs collapsed";
 
-  workspace.tabs.forEach((tab) => {
+  workspace.tabs.forEach((tab, tabIndex) => {
     const tabItem = document.createElement("div");
     tabItem.className = "workspace-tab-item";
     tabItem.innerHTML = `
@@ -356,12 +356,14 @@ function createWorkspaceElement(workspace) {
         <div class="tab-title">${tab.title}</div>
         <!-- you can add more info here -->
       </div>
+      <button class="delete-tab" data-workspace-id="${workspace.id}" data-tab-index="${tabIndex}">✕</button>
     `;
     // make it look clickable
-    tabItem.style.cursor = "pointer";
-    // add click handler to open just this tab
-    tabItem.addEventListener("click", () => {
-      showToast(`Opening tab “${tab.title}”…`, "default");
+    tabItem.addEventListener("click", (e) => {
+      // Don't open tab if clicking the delete button
+      if (e.target.classList.contains('delete-tab')) return;
+      
+      showToast(`Opening tab "${tab.title}"…`, "default");
       chrome.tabs.create({ url: tab.url });
     });
     tabsList.appendChild(tabItem);
@@ -511,12 +513,11 @@ function setupEventListeners() {
         container.appendChild(workspaceElement);
       });
     });
-
   // Workspace actions with confirmation for delete
   document
     .getElementById("workspaces-container")
     .addEventListener("click", async (e) => {
-      const workspaceId = e.target.dataset.id;
+      const workspaceId = e.target.dataset.id || e.target.dataset.workspaceId;
       if (!workspaceId) return;
 
       if (e.target.classList.contains("open-workspace")) {
@@ -549,6 +550,38 @@ function setupEventListeners() {
               );
               await chrome.storage.local.set({ workspaces: updatedWorkspaces });
               showToast(`Workspace "${workspace.name}" deleted`, "warning");
+              await loadSavedWorkspaces();
+            }
+          );
+        }      }
+
+      // Handle delete tab button click
+      if (e.target.classList.contains("delete-tab")) {
+        const tabIndex = e.target.dataset.tabIndex;
+        const workspace = (await chrome.storage.local.get("workspaces")).workspaces.find(
+          (w) => w.id === workspaceId
+        );
+
+        if (workspace && tabIndex !== undefined) {
+          const tabToDelete = workspace.tabs[tabIndex];
+
+          showConfirmDialog(
+            "Delete Tab",
+            `Are you sure you want to delete the tab "${tabToDelete.title}"? This action cannot be undone.`,
+            async () => {
+              // Update the workspace.tabs array
+              workspace.tabs.splice(tabIndex, 1);
+
+              // Update the workspace in storage
+              const { workspaces = [] } = await chrome.storage.local.get(
+                "workspaces"
+              );
+              const updatedWorkspaces = workspaces.map((w) =>
+                w.id === workspaceId ? workspace : w
+              );
+              await chrome.storage.local.set({ workspaces: updatedWorkspaces });
+
+              showToast(`Tab "${tabToDelete.title}" deleted`, "warning");
               await loadSavedWorkspaces();
             }
           );
