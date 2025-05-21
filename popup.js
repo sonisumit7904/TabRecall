@@ -1,5 +1,6 @@
 // Tab management and UI functionality
 let currentTabs = [];
+let workspaceSearchResults = []; // Store search results for workspaces
 
 // Initialize popup
 document.addEventListener("DOMContentLoaded", async () => {
@@ -8,7 +9,66 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadCurrentTabs();
   await loadSavedWorkspaces();
   setupEventListeners();
+  setupWorkspaceSearch();
 });
+
+// Setup workspace search functionality
+function setupWorkspaceSearch() {
+  const workspaceNameInput = document.getElementById("workspace-name");
+  const suggestionsContainer = document.getElementById("workspace-suggestions");
+  const createNewBtn = document.getElementById("create-new-btn");
+  
+  workspaceNameInput.addEventListener("input", async function() {
+    const searchTerm = this.value.trim().toLowerCase();
+    const { workspaces = [] } = await chrome.storage.local.get("workspaces");
+    
+    // Filter workspaces based on search term
+    workspaceSearchResults = searchTerm.length > 0 
+      ? workspaces.filter(w => w.name.toLowerCase().includes(searchTerm))
+      : [];
+    
+    // Clear previous suggestions
+    suggestionsContainer.innerHTML = "";
+    
+    // Add suggestions for matching workspaces
+    workspaceSearchResults.forEach(workspace => {
+      const item = document.createElement("div");
+      item.className = "autocomplete-item";
+      item.textContent = workspace.name;
+      
+      item.addEventListener("click", () => {
+        workspaceNameInput.value = workspace.name;
+        suggestionsContainer.innerHTML = ""; // Clear suggestions after selection
+        suggestionsContainer.style.display = "none";
+        // Save to this workspace immediately
+        saveToWorkspace(workspace.name, true);
+      });
+      
+      suggestionsContainer.appendChild(item);
+    });
+    
+    // Show/hide suggestions container
+    if (workspaceSearchResults.length > 0 && searchTerm.length > 0) {
+      suggestionsContainer.style.display = "block";
+    } else {
+      suggestionsContainer.style.display = "none";
+    }
+  });
+  
+  // Handle create new button click
+  createNewBtn.addEventListener("click", () => {
+    // Create a new workspace with the current input value
+    const name = workspaceNameInput.value.trim() || `Workspace ${new Date().toLocaleDateString()}`;
+    saveToWorkspace(name, false);
+  });
+  
+  // Hide suggestions when clicking outside
+  document.addEventListener("click", (e) => {
+    if (e.target !== workspaceNameInput && !e.target.closest("#workspace-suggestions")) {
+      suggestionsContainer.style.display = "none";
+    }
+  });
+}
 
 // Setup tab navigation
 function setupTabNavigation() {
@@ -134,7 +194,6 @@ async function loadCurrentTabs() {
   const tabsList = document.getElementById("tabs-list");
   tabsList.innerHTML =
     '<div class="empty-state"><div class="loading"></div><div>Loading tabs...</div></div>';
-
   try {
     const tabs = await chrome.tabs.query({ currentWindow: true });
     currentTabs = tabs;
@@ -201,6 +260,9 @@ function createTabElement(tab) {
   checkbox.className = "tab-checkbox";
   checkbox.checked = true;
   checkbox.dataset.tabUrl = tab.url;
+  checkbox.dataset.tabId = tab.id;
+  checkbox.dataset.tabTitle = tab.title;
+  checkbox.dataset.tabFavIconUrl = tab.favIconUrl || "";
 
   const favicon = document.createElement("img");
   favicon.className = "tab-favicon";
@@ -222,6 +284,14 @@ function createTabElement(tab) {
   // if (tab.summary) {
   //  content.appendChild(summary);
   // }
+
+  // Make the whole tab item clickable to toggle checkbox
+  div.addEventListener("click", (e) => {
+    // Don't toggle if clicking on the checkbox itself
+    if (e.target !== checkbox) {
+      checkbox.checked = !checkbox.checked;
+    }
+  });
 
   div.appendChild(checkbox);
   div.appendChild(favicon);
@@ -445,22 +515,134 @@ function createWorkspaceElement(workspace) {
   return div;
 }
 
+// Helper function to save tabs to workspace
+async function saveToWorkspace(name, isAddingToExisting) {
+  try {
+    // Get all checked tabs
+    const selectedCheckboxes = document.querySelectorAll(".tab-checkbox:checked");
+    const selectedTabUrls = Array.from(selectedCheckboxes).map(
+      checkbox => checkbox.dataset.tabUrl
+    );
+    
+    // Filter currentTabs to include only selected tabs
+    const selectedTabs = currentTabs.filter(tab => 
+      selectedTabUrls.includes(tab.url)
+    );
+    
+    // Check if any tabs are selected
+    if (selectedTabs.length === 0) {
+      showToast("Please select at least one tab to save", "warning");
+      return;
+    }
+
+    const summarizedTabs = await Promise.all(
+      selectedTabs.map(async (tab) => {
+        try {
+          const tabData = await chrome.runtime.sendMessage({
+            action: "summarizeTab",
+            tab,
+          });
+          return (
+            tabData || {
+              url: tab.url,
+              title: tab.title,
+              favIconUrl: tab.favIconUrl,
+              summary: "No summary available",
+            }
+          );
+        } catch (error) {
+          console.warn(
+            "No summary available for tab, using fallback info:",
+            error
+          );
+          return {
+            url: tab.url,
+            title: tab.title,
+            favIconUrl: tab.favIconUrl,
+            summary: "No summary available",
+          };
+        }
+      })
+    );
+
+    const { workspaces = [] } = await chrome.storage.local.get("workspaces");
+    
+    // Check if we're adding to an existing workspace
+    if (isAddingToExisting) {
+      // Find the existing workspace with the given name
+      const existingWorkspaceIndex = workspaces.findIndex(w => 
+        w.name.toLowerCase() === name.toLowerCase()
+      );
+      
+      if (existingWorkspaceIndex === -1) {
+        showToast(`No workspace named "${name}" found. Creating new workspace instead.`, "warning");
+        // Create new workspace
+        const newWorkspace = {
+          id: Date.now().toString(),
+          name,
+          tabs: summarizedTabs,
+          created: Date.now(),
+          summary: summarizedTabs.map((tab) => tab.title).join(", "),
+        };
+        workspaces.push(newWorkspace);
+        showToast(`New workspace "${name}" created with ${summarizedTabs.length} tabs!`, "success");
+      } else {
+        // Add to existing workspace
+        const existingWorkspace = workspaces[existingWorkspaceIndex];
+        
+        // Add unique tabs (avoid duplicates by URL)
+        const existingUrls = new Set(existingWorkspace.tabs.map(tab => tab.url));
+        const uniqueNewTabs = summarizedTabs.filter(tab => !existingUrls.has(tab.url));
+        
+        existingWorkspace.tabs.push(...uniqueNewTabs);
+        
+        // Update the summary to include all tabs
+        existingWorkspace.summary = existingWorkspace.tabs.map(tab => tab.title).join(", ");
+        
+        // Replace the workspace in the array
+        workspaces[existingWorkspaceIndex] = existingWorkspace;
+        
+        showToast(`Added ${uniqueNewTabs.length} tabs to "${name}"!`, "success");
+      }
+    } else {
+      // Create new workspace
+      const newWorkspace = {
+        id: Date.now().toString(),
+        name,
+        tabs: summarizedTabs,
+        created: Date.now(),
+        summary: summarizedTabs.map((tab) => tab.title).join(", "),
+      };
+      workspaces.push(newWorkspace);
+      showToast(`Workspace "${name}" saved with ${summarizedTabs.length} tabs!`, "success");
+    }
+    
+    // Save updated workspaces
+    await chrome.storage.local.set({ workspaces });
+    
+    // Clear the input field and refresh workspaces list
+    document.getElementById("workspace-name").value = "";
+    await loadSavedWorkspaces();
+  } catch (error) {
+    console.error("Error saving workspace:", error);
+    showToast("Failed to save workspace", "error");
+  }
+}
+
 // Setup event listeners
-function setupEventListeners() {
-  // Save workspace with loading state and success notification
+function setupEventListeners() {  // Save workspace with loading state and success notification
   document.getElementById("save-btn").addEventListener("click", async () => {
     const saveBtn = document.getElementById("save-btn");
     const originalText = saveBtn.textContent;
 
     // Show loading state
     saveBtn.classList.add("loading");
-    saveBtn.disabled = true;
-
-    try {
+    saveBtn.disabled = true;    try {
       const nameInput = document.getElementById("workspace-name");
-      const name =
-        nameInput.value.trim() ||
-        `Workspace ${new Date().toLocaleDateString()}`;
+      const name = nameInput.value.trim() || `Workspace ${new Date().toLocaleDateString()}`;
+      const isAddingToExisting = workspaceSearchResults.some(w => 
+        w.name.toLowerCase() === name.toLowerCase()
+      );
       
       // Get all checked tabs
       const selectedCheckboxes = document.querySelectorAll(".tab-checkbox:checked");
@@ -509,21 +691,60 @@ function setupEventListeners() {
         })
       );
 
-      // Update workspace summary to list all tab names separated by commas.
-      const workspace = {
-        id: Date.now().toString(),
-        name,
-        tabs: summarizedTabs,
-        created: Date.now(),
-        summary: summarizedTabs.map((tab) => tab.title).join(", "),
-      };
-
       const { workspaces = [] } = await chrome.storage.local.get("workspaces");
-      workspaces.push(workspace);
+      
+      // Check if we're adding to an existing workspace
+      if (isAddingToExisting) {
+        // Find the existing workspace with the given name
+        const existingWorkspaceIndex = workspaces.findIndex(w => 
+          w.name.toLowerCase() === name.toLowerCase()
+        );
+        
+        if (existingWorkspaceIndex === -1) {
+          showToast(`No workspace named "${name}" found. Creating new workspace instead.`, "warning");
+          // Create new workspace
+          const newWorkspace = {
+            id: Date.now().toString(),
+            name,
+            tabs: summarizedTabs,
+            created: Date.now(),
+            summary: summarizedTabs.map((tab) => tab.title).join(", "),
+          };
+          workspaces.push(newWorkspace);
+          showToast(`New workspace "${name}" created with ${summarizedTabs.length} tabs!`, "success");
+        } else {
+          // Add to existing workspace
+          const existingWorkspace = workspaces[existingWorkspaceIndex];
+          
+          // Add unique tabs (avoid duplicates by URL)
+          const existingUrls = new Set(existingWorkspace.tabs.map(tab => tab.url));
+          const uniqueNewTabs = summarizedTabs.filter(tab => !existingUrls.has(tab.url));
+          
+          existingWorkspace.tabs.push(...uniqueNewTabs);
+          
+          // Update the summary to include all tabs
+          existingWorkspace.summary = existingWorkspace.tabs.map(tab => tab.title).join(", ");
+          
+          // Replace the workspace in the array
+          workspaces[existingWorkspaceIndex] = existingWorkspace;
+          
+          showToast(`Added ${uniqueNewTabs.length} tabs to "${name}"!`, "success");
+        }
+      } else {
+        // Create new workspace
+        const newWorkspace = {
+          id: Date.now().toString(),
+          name,
+          tabs: summarizedTabs,
+          created: Date.now(),
+          summary: summarizedTabs.map((tab) => tab.title).join(", "),
+        };
+        workspaces.push(newWorkspace);
+        showToast(`Workspace "${name}" saved with ${summarizedTabs.length} tabs!`, "success");
+      }
+      
+      // Save updated workspaces
       await chrome.storage.local.set({ workspaces });
-
-      // Success notification
-      showToast(`Workspace "${name}" saved with ${summarizedTabs.length} tabs!`, "success");
 
       nameInput.value = "";
       await loadSavedWorkspaces();

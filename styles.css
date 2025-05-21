@@ -43,6 +43,8 @@
   --light-border-color: #bae6fd; /* Sky 200 */
   --light-shadow-color: rgba(14, 165, 233, 0.15); /* Sky shadow */
   --light-input-bg-color: #f0f9ff; /* Sky 50 */
+  --secondary-button-bg: #374151; /* Dark gray for secondary buttons */
+  --secondary-button-hover-bg: #475569; /* Slightly lighter gray for hover */
 }
 
 * {
@@ -215,7 +217,7 @@ input[type="text"]:focus {
 }
 
 .tab-item:hover {
-  background-color: rgba(59, 130, 246, 0.05); /* Subtle hover background */
+  background-color: var(--hover-bg);
 }
 
 .tab-item:last-child {
@@ -1020,6 +1022,30 @@ input[type="text"]:focus {
   color: var(--text-color);
 }
 
+/* Select all checkbox container */
+.select-all-container {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.select-all-container label {
+  margin-left: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.select-all-container input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
 /* Custom checkbox styling */
 input[type="checkbox"] {
   appearance: none;
@@ -1046,9 +1072,12 @@ input[type="checkbox"]:checked::after {
   position: absolute;
 }
 
-/* Tab checkbox specific styling */
+/* Tab checkbox styles */
 .tab-checkbox {
-  margin-right: 8px;
+  margin-right: 10px;
+  min-width: 16px;
+  min-height: 16px;
+  cursor: pointer;
 }
 
 /* Light theme checkbox styling */
@@ -1059,4 +1088,36 @@ input[type="checkbox"]:checked::after {
 
 .light-theme input[type="checkbox"]:checked::after {
   background: var(--primary-color);
+}
+
+/* Workspace search container */
+.workspace-search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.autocomplete-container {
+  position: relative;
+  flex: 1;
+}
+
+#workspace-name {
+  width: 100%;
+}
+
+.secondary-btn {
+  background-color: var(--secondary-button-bg);
+  color: var(--text-color);
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.secondary-btn:hover {
+  background-color: var(--secondary-button-hover-bg);
 }

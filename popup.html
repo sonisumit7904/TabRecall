@@ -42,10 +42,15 @@
 
     <main>
       <section id="save-workspace" class="tab-content active">
-        <div class="workspace-form">
-          <div class="input-group">
-            <label for="workspace-name">Workspace Name</label>
-            <input type="text" id="workspace-name" placeholder="Enter workspace name (optional)">
+        <div class="workspace-form">          <div class="input-group">
+            <label for="workspace-name">Add to workspace</label>
+            <div class="workspace-search-container">
+              <div class="autocomplete-container">
+                <input type="text" id="workspace-name" placeholder="Search existing workspaces...">
+                <div id="workspace-suggestions" class="autocomplete-items"></div>
+              </div>
+              <button id="create-new-btn" class="secondary-btn">Create New</button>
+            </div>
           </div>
           <div class="tabs-preview">
             <h3>Current Tabs</h3>
@@ -61,7 +66,7 @@
 
       <section id="workspaces-list" class="tab-content">
         <div class="search-bar">
-          <input type="text" id="search-workspaces" placeholder="Search workspaces...">
+          <input type="text" id="search-workspaces" placeholder="Search existing workspaces...">
         </div>
         <div id="workspaces-container">
           <!-- Workspaces will be inserted here -->
