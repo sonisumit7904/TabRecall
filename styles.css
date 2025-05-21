@@ -1001,3 +1001,62 @@ input[type="text"]:focus {
   width: 1.2rem;
   height: 1.2rem;
 }
+
+/* Select All container styling */
+.select-all-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: var(--card-bg-lighter);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.select-all-container label {
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+/* Custom checkbox styling */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--primary-color);
+  border-radius: 4px;
+  background: var(--input-bg-color);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+input[type="checkbox"]:checked::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: var(--primary-color);
+  border-radius: 2px;
+  position: absolute;
+}
+
+/* Tab checkbox specific styling */
+.tab-checkbox {
+  margin-right: 8px;
+}
+
+/* Light theme checkbox styling */
+.light-theme input[type="checkbox"] {
+  border-color: var(--primary-color);
+  background: var(--light-input-bg-color);
+}
+
+.light-theme input[type="checkbox"]:checked::after {
+  background: var(--primary-color);
+}

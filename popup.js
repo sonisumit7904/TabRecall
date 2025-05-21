@@ -140,6 +140,31 @@ async function loadCurrentTabs() {
     currentTabs = tabs;
     // Clear the loading UI before appending tabs
     tabsList.innerHTML = "";
+    
+    // Add select all checkbox
+    const selectAllContainer = document.createElement("div");
+    selectAllContainer.className = "select-all-container";
+    
+    const selectAllCheckbox = document.createElement("input");
+    selectAllCheckbox.type = "checkbox";
+    selectAllCheckbox.id = "select-all-tabs";
+    selectAllCheckbox.checked = true;
+    
+    const selectAllLabel = document.createElement("label");
+    selectAllLabel.htmlFor = "select-all-tabs";
+    selectAllLabel.textContent = "Select/Deselect All";
+    
+    selectAllContainer.appendChild(selectAllCheckbox);
+    selectAllContainer.appendChild(selectAllLabel);
+    tabsList.appendChild(selectAllContainer);
+    
+    // Add event listener for select all checkbox
+    selectAllCheckbox.addEventListener("change", () => {
+      const checkboxes = document.querySelectorAll(".tab-checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
+    });
 
     for (const tab of tabs) {
       let tabData;
@@ -170,6 +195,13 @@ function createTabElement(tab) {
   const div = document.createElement("div");
   div.className = "tab-item";
 
+  // Add checkbox for tab selection
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.className = "tab-checkbox";
+  checkbox.checked = true;
+  checkbox.dataset.tabUrl = tab.url;
+
   const favicon = document.createElement("img");
   favicon.className = "tab-favicon";
   favicon.src = tab.favIconUrl || "icons/default-favicon.png";
@@ -191,6 +223,7 @@ function createTabElement(tab) {
   //  content.appendChild(summary);
   // }
 
+  div.appendChild(checkbox);
   div.appendChild(favicon);
   div.appendChild(content);
 
@@ -428,9 +461,26 @@ function setupEventListeners() {
       const name =
         nameInput.value.trim() ||
         `Workspace ${new Date().toLocaleDateString()}`;
+      
+      // Get all checked tabs
+      const selectedCheckboxes = document.querySelectorAll(".tab-checkbox:checked");
+      const selectedTabUrls = Array.from(selectedCheckboxes).map(
+        checkbox => checkbox.dataset.tabUrl
+      );
+      
+      // Filter currentTabs to include only selected tabs
+      const selectedTabs = currentTabs.filter(tab => 
+        selectedTabUrls.includes(tab.url)
+      );
+      
+      // Check if any tabs are selected
+      if (selectedTabs.length === 0) {
+        showToast("Please select at least one tab to save", "warning");
+        return;
+      }
 
       const summarizedTabs = await Promise.all(
-        currentTabs.map(async (tab) => {
+        selectedTabs.map(async (tab) => {
           try {
             const tabData = await chrome.runtime.sendMessage({
               action: "summarizeTab",
@@ -473,7 +523,7 @@ function setupEventListeners() {
       await chrome.storage.local.set({ workspaces });
 
       // Success notification
-      showToast(`Workspace "${name}" saved successfully!`, "success");
+      showToast(`Workspace "${name}" saved with ${summarizedTabs.length} tabs!`, "success");
 
       nameInput.value = "";
       await loadSavedWorkspaces();
