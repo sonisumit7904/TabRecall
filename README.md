@@ -13,8 +13,11 @@ A modern browser extension to save and organize open tabs into AI-summarized wor
 
 ## Features
 - **Save Workspace:** Capture current tabs and save them as a workspace.
+- **Add to Workspace:** Add selected tabs to an existing workspace.
 - **AI-Summarization:** Generate summaries for your tabs using Hugging Face APIs.
-- **Workspace Management:** View, search, and delete your saved workspaces.
+- **Workspace Management:** View, search, delete, and manage workspaces.
+- **Tab Management:** Select, open, and delete individual tabs within a workspace.
+- **Light/Dark Mode:** Toggle between light and dark themes.
 - **Responsive UI:** Works seamlessly across devices with a modern, card-style interface.
 - **Icon Support:** Uses Lucide React icons for logos and UI elements.
 - **Customizable:** Easily modify the UI using Tailwind CSS and custom styles.
