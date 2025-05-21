@@ -17,6 +17,7 @@ function setupWorkspaceSearch() {
   const workspaceNameInput = document.getElementById("workspace-name");
   const suggestionsContainer = document.getElementById("workspace-suggestions");
   const createNewBtn = document.getElementById("create-new-btn");
+  let hoverTimeout; // Variable to store the timeout ID
   
   workspaceNameInput.addEventListener("input", async function() {
     const searchTerm = this.value.trim().toLowerCase();
@@ -42,6 +43,23 @@ function setupWorkspaceSearch() {
         suggestionsContainer.style.display = "none";
         // Save to this workspace immediately
         saveToWorkspace(workspace.name, true);
+      });
+      
+      // Add mouseenter event to show hint after a delay
+      item.addEventListener("mouseenter", () => {
+        // Clear any existing timeout
+        clearTimeout(hoverTimeout);
+        // Set a new timeout
+        hoverTimeout = setTimeout(() => {
+          // Show hint (tooltip)
+          item.title = `Add current tabs to "${workspace.name}"`;
+        }, 10); // 500ms delay
+      });
+
+      // Add mouseleave event to clear hint and timeout
+      item.addEventListener("mouseleave", () => {
+        clearTimeout(hoverTimeout);
+        item.title = ""; // Clear the tooltip
       });
       
       suggestionsContainer.appendChild(item);

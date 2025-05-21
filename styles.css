@@ -1,4 +1,7 @@
 :root {
+  --hover-bg: #374151; /* For dark theme autocomplete item hover */
+  --light-hover-bg: #e5e7eb; /* For light theme autocomplete item hover */
+
   /* Main color theme inspired by the colorful gradient squares */
   --primary-color: #3B82F6; /* Bright blue */
   --primary-hover: #2563EB; /* Darker blue */
@@ -1096,12 +1099,75 @@ input[type="checkbox"]:checked::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
 }
 
 .autocomplete-container {
   position: relative;
   flex: 1;
+}
+
+/* Styles for the autocomplete suggestions container */
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid var(--border-color);
+  z-index: 99;
+  top: 100%; /* Position below the input */
+  left: 0;
+  right: 0;
+  background-color: var(--input-bg-color); /* Use a solid background color from the theme */
+  border-radius: 0.5rem; /* Rounded corners for the container */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Slightly more pronounced shadow for better depth */
+  max-height: 200px; /* Limit height and enable scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Styles for individual autocomplete suggestion items */
+.autocomplete-item {
+  padding: 0.85rem 1.15rem; /* Slightly increased padding for better spacing */
+  cursor: pointer;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color); /* Separator line */
+  background-color: transparent; /* Items are transparent; container bg shows through */
+  transition: background-color 0.15s ease-in-out; /* Smooth hover transition */
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none; /* No border for the last item */
+  /* The container's border-radius will clip content due to overflow: auto/hidden */
+}
+
+.autocomplete-item:hover {
+  background-color: var(--hover-bg); /* Hover effect */
+  color: var(--text-color); /* Ensure text color is consistent */
+}
+
+/* Style for an "active" item (e.g., selected via keyboard) */
+.autocomplete-item.active {
+  background-color: var(--primary-color);
+  color: #ffffff; /* White text for better contrast on primary color */
+}
+
+.light-theme .autocomplete-items {
+  background-color: var(--light-input-bg-color); /* Solid background for light theme */
+  border-color: var(--light-border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Adjusted shadow for light theme */
+}
+
+.light-theme .autocomplete-item {
+  color: var(--light-text-color);
+  border-bottom-color: var(--light-border-color);
+  /* background-color: transparent; is inherited, items show container's background */
+}
+
+.light-theme .autocomplete-item:hover {
+  background-color: var(--light-hover-bg);
+  color: var(--light-text-color); /* Ensure text color is consistent */
+}
+
+.light-theme .autocomplete-item.active {
+  background-color: var(--primary-color); /* Assuming primary-color is suitable for active state in light theme */
+  color: #ffffff; /* White text for better contrast */
 }
 
 #workspace-name {
