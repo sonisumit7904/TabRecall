@@ -315,6 +315,9 @@ input[type="text"]:focus {
   font-size: 1.1rem; /* Adjusted size */
   font-weight: 600;
   color: var(--text-color);
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflowed text */
+  text-overflow: ellipsis; /* Add ellipsis for overflowed text */
 }
 
 .workspace-actions {
