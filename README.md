@@ -33,15 +33,17 @@ A modern browser extension to save and organize open tabs into AI-summarized wor
 ## Getting Started
 
 ### For End Users
-1. **Download Extension:**  
-   Download the zip file for TabRecall.
-2. **Extract Files:**  
-   Extract the downloaded zip file to your preferred location.
-3. **Load the Extension in Chrome:**  
-   - Open Chrome and navigate to `chrome://extensions`
-   - Enable **Developer mode** by toggling the switch at the top right.
-   - Click on the **Load unpacked** button.
-   - Select the folder where you extracted the extension files (typically the `dist` folder after building).
+
+1.  **Download Extension:**
+    *   Go to the [**Releases page**](https://github.com/sonisumit7904/TabRecall/releases) on GitHub.
+    *   Download the latest `TabRecall-vX.Y.Z.zip` file.
+2.  **Extract Files:**
+    *   Extract the downloaded zip file to your preferred location. This will create a folder, and inside it, this should be the folder that contains `manifest.json` and other built assets.
+3.  **Load the Extension in Chrome:**
+    *   Open Chrome and navigate to `chrome://extensions`.
+    *   Enable **Developer mode** by toggling the switch at the top right.
+    *   Click on the **Load unpacked** button.
+    *   Select the folder containing the extension files (this should be the folder that contains `manifest.json` and other built assets).
 
 ### For Developers
 1. **Clone the repository:**
