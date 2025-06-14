@@ -2,10 +2,10 @@
   "name": "vite-react-typescript-starter",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
+  "type": "module",  "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
+    "build:extension": "npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
