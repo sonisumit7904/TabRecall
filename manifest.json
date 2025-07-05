@@ -6,10 +6,13 @@
   "permissions": [
     "tabs",
     "storage",
-    "scripting"
+    "scripting",
+    "identity"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "http://localhost:8080/*",
+    "https://api.tabrecall.com/*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -37,7 +40,15 @@
   "omnibox": {
     "keyword": "ws"
   },
+  "oauth2": {
+    "client_id": "59015065728-7o0hve0tu4vjgh2b9fp5mgnf6a2kdim8.apps.googleusercontent.com",
+    "scopes": [
+      "openid",
+      "email", 
+      "profile"
+    ]
+  },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://www.googleapis.com/ http://localhost:8080/ https://api.tabrecall.com/;"
   }
 }
