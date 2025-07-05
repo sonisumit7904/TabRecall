@@ -1,5 +1,5 @@
 // Import authentication functions from the utility file
-import { loginWithGoogle, checkLoginStatus, logoutUser } from './src/utils/auth.js';
+import { loginWithGoogle, checkLoginStatus, logoutUser } from './utils/auth.js';
 
 // Tab management and UI functionality
 let currentTabs = [];
@@ -23,33 +23,46 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Function to update the authentication UI state
 function updateAuthUI(user) {
-  const userInfoDiv = document.getElementById("userInfo");
   const loginButton = document.getElementById("loginBtn");
   const logoutButton = document.getElementById("logoutBtn");
+  const userAvatar = document.getElementById("userAvatar");
+  const userInitials = document.getElementById("userInitials");
   
-  if (!userInfoDiv || !loginButton || !logoutButton) return; // Ensure elements exist
+  if (!loginButton || !logoutButton) return; // Ensure elements exist
 
   if (user && (user.email || user.name || user.userId || user.id)) { // Check for valid user object
-    userInfoDiv.innerHTML = `<strong>Logged in as:</strong> ${user.email || user.name || "User"}`;
-    userInfoDiv.style.color = "#222";
+    // User is logged in - show logout button with avatar/initials
     loginButton.style.display = "none";
-    logoutButton.style.display = "inline-block"; // Show logout button
+    logoutButton.style.display = "flex";
+    
+    // Handle user avatar or initials (only if elements exist)
+    if (userAvatar && userInitials) {
+      if (user.picture) {
+        userAvatar.src = user.picture;
+        userAvatar.style.display = "block";
+        userInitials.style.display = "none";
+      } else {
+        // Show initials if no picture
+        const name = user.name || user.email || "User";
+        const initials = name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase();
+        userInitials.textContent = initials;
+        userInitials.style.display = "flex";
+        userAvatar.style.display = "none";
+      }
+    }
   } else {
-    userInfoDiv.textContent = "Not logged in.";
-    userInfoDiv.style.color = "#b00";
-    loginButton.style.display = "inline-block"; // Show login button
+    // User is not logged in - show login button
+    loginButton.style.display = "flex";
     logoutButton.style.display = "none";
+    
+    // Hide avatar/initials if elements exist
+    if (userAvatar) userAvatar.style.display = "none";
+    if (userInitials) userInitials.style.display = "none";
   }
 }
 
 // Initial check for login status when the popup opens
 async function checkAndDisplayLoginStatus() {
-  const userInfoDiv = document.getElementById("userInfo");
-  if (userInfoDiv) {
-    userInfoDiv.textContent = "Checking login status...";
-    userInfoDiv.style.color = "#888";
-  }
-  
   const user = await checkLoginStatus();
   updateAuthUI(user);
 }
@@ -66,7 +79,8 @@ async function initializeAuth() {
   if (loginButton) {
     loginButton.addEventListener("click", async () => {
       loginButton.disabled = true; // Disable button during login
-      loginButton.textContent = "Logging in...";
+      const originalHTML = loginButton.innerHTML;
+      loginButton.innerHTML = "Logging in...";
       try {
         const user = await loginWithGoogle();
         updateAuthUI(user);
@@ -80,7 +94,7 @@ async function initializeAuth() {
         updateAuthUI(null); // Show logged out state on error
       } finally {
         loginButton.disabled = false;
-        loginButton.textContent = "Login with Google";
+        loginButton.innerHTML = originalHTML;
       }
     });
   }
@@ -88,7 +102,8 @@ async function initializeAuth() {
   if (logoutButton) {
     logoutButton.addEventListener("click", async () => {
       logoutButton.disabled = true; // Disable button during logout
-      logoutButton.textContent = "Logging out...";
+      const originalHTML = logoutButton.innerHTML;
+      logoutButton.innerHTML = "Logging out...";
       try {
         await logoutUser();
         updateAuthUI(null); // Set to logged out state
@@ -103,7 +118,7 @@ async function initializeAuth() {
         checkAndDisplayLoginStatus();
       } finally {
         logoutButton.disabled = false;
-        logoutButton.textContent = "Logout";
+        logoutButton.innerHTML = originalHTML;
       }
     });
   }
@@ -390,7 +405,7 @@ function createTabElement(tab) {
 
   const favicon = document.createElement("img");
   favicon.className = "tab-favicon";
-  favicon.src = tab.favIconUrl || "icons/default-favicon.png";
+  favicon.src = tab.favIconUrl || "icons/icon16.png";
   favicon.alt = "";
 
   const content = document.createElement("div");
@@ -577,7 +592,7 @@ function createWorkspaceElement(workspace) {
     tabItem.className = "workspace-tab-item";
     tabItem.innerHTML = `
       <img src="${
-        tab.favIconUrl || "icons/default-favicon.png"
+        tab.favIconUrl || "icons/icon16.png"
       }" alt="" class="tab-favicon">
       <div class="tab-details">
         <div class="tab-title">${tab.title}</div>

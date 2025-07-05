@@ -2,7 +2,7 @@
 
 // Configuration for backend integration
 const CONFIG = {
-  BACKEND_URL: "http://localhost:8081", // Adjust this to your actual backend URL
+  BACKEND_URL: "http://localhost:8081", // Updated to match your actual backend URL
 };
 
 // Internal helper to get user info from Google using the access token

@@ -20,5 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src/**/*", "src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "scripts", "test", "tests", "e2e", "e2e-tests", "cypress", "cypress.config.ts", "cypress.config.js"]
 }
