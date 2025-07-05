@@ -1,3 +1,6 @@
+// Import authentication functions from the utility file
+import { loginWithGoogle, checkLoginStatus, logoutUser } from './src/utils/auth.js';
+
 // Tab management and UI functionality
 let currentTabs = [];
 let workspaceSearchResults = []; // Store search results for workspaces
@@ -6,11 +9,108 @@ let workspaceSearchResults = []; // Store search results for workspaces
 document.addEventListener("DOMContentLoaded", async () => {
   setupTabNavigation();
   createToastContainer(); // Create toast container for notifications
+  
+  // Initialize authentication UI and check login status
+  await initializeAuth();
+  
   await loadCurrentTabs();
   await loadSavedWorkspaces();
   setupEventListeners();
   setupWorkspaceSearch();
 });
+
+// --- Authentication UI and Logic Integration ---
+
+// Function to update the authentication UI state
+function updateAuthUI(user) {
+  const userInfoDiv = document.getElementById("userInfo");
+  const loginButton = document.getElementById("loginBtn");
+  const logoutButton = document.getElementById("logoutBtn");
+  
+  if (!userInfoDiv || !loginButton || !logoutButton) return; // Ensure elements exist
+
+  if (user && (user.email || user.name || user.userId || user.id)) { // Check for valid user object
+    userInfoDiv.innerHTML = `<strong>Logged in as:</strong> ${user.email || user.name || "User"}`;
+    userInfoDiv.style.color = "#222";
+    loginButton.style.display = "none";
+    logoutButton.style.display = "inline-block"; // Show logout button
+  } else {
+    userInfoDiv.textContent = "Not logged in.";
+    userInfoDiv.style.color = "#b00";
+    loginButton.style.display = "inline-block"; // Show login button
+    logoutButton.style.display = "none";
+  }
+}
+
+// Initial check for login status when the popup opens
+async function checkAndDisplayLoginStatus() {
+  const userInfoDiv = document.getElementById("userInfo");
+  if (userInfoDiv) {
+    userInfoDiv.textContent = "Checking login status...";
+    userInfoDiv.style.color = "#888";
+  }
+  
+  const user = await checkLoginStatus();
+  updateAuthUI(user);
+}
+
+// Initialize authentication
+async function initializeAuth() {
+  console.log("TabRecall Popup: Initializing authentication...");
+
+  // Get references to auth UI elements
+  const loginButton = document.getElementById("loginBtn");
+  const logoutButton = document.getElementById("logoutBtn");
+
+  // Add event listeners for auth buttons
+  if (loginButton) {
+    loginButton.addEventListener("click", async () => {
+      loginButton.disabled = true; // Disable button during login
+      loginButton.textContent = "Logging in...";
+      try {
+        const user = await loginWithGoogle();
+        updateAuthUI(user);
+        console.log("Login successful in TabRecall popup!");
+        showToast("Successfully logged in!", "success");
+        // Optionally trigger a refresh of TabRecall's main UI if it depends on login status
+        // e.g., updateWorkspaceDisplay();
+      } catch (error) {
+        console.error("TabRecall Login failed:", error);
+        showToast(`Login failed: ${error.message}`, "error");
+        updateAuthUI(null); // Show logged out state on error
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = "Login with Google";
+      }
+    });
+  }
+
+  if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
+      logoutButton.disabled = true; // Disable button during logout
+      logoutButton.textContent = "Logging out...";
+      try {
+        await logoutUser();
+        updateAuthUI(null); // Set to logged out state
+        console.log("Logout successful in TabRecall popup!");
+        showToast("Successfully logged out!", "success");
+        // Optionally trigger a refresh of TabRecall's main UI
+        // e.g., updateWorkspaceDisplay();
+      } catch (error) {
+        console.error("TabRecall Logout failed:", error);
+        showToast(`Logout failed: ${error.message}`, "error");
+        // If logout failed, user might still be logged in, so re-check status
+        checkAndDisplayLoginStatus();
+      } finally {
+        logoutButton.disabled = false;
+        logoutButton.textContent = "Logout";
+      }
+    });
+  }
+
+  // Check and display initial login status
+  await checkAndDisplayLoginStatus();
+}
 
 // Setup workspace search functionality
 function setupWorkspaceSearch() {

@@ -12,6 +12,7 @@
   "host_permissions": [
     "<all_urls>",
     "http://localhost:8080/*",
+    "http://localhost:8081/*",
     "https://api.tabrecall.com/*"
   ],
   "background": {
@@ -49,6 +50,6 @@
     ]
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://www.googleapis.com/ http://localhost:8080/ https://api.tabrecall.com/;"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://www.googleapis.com/ http://localhost:8080/ http://localhost:8081/ https://api.tabrecall.com/;"
   }
 }
