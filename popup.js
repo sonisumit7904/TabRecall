@@ -38,9 +38,29 @@ function updateAuthUI(user) {
     // Handle user avatar or initials (only if elements exist)
     if (userAvatar && userInitials) {
       if (user.picture) {
-        userAvatar.src = user.picture;
-        userAvatar.style.display = "block";
-        userInitials.style.display = "none";
+        // Preload the image to avoid flickering
+        const img = new Image();
+        img.onload = () => {
+          userAvatar.src = user.picture;
+          userAvatar.style.display = "block";
+          userInitials.style.display = "none";
+        };
+        img.onerror = () => {
+          // Fallback to initials if image fails to load
+          const name = user.name || user.email || "User";
+          const initials = name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase();
+          userInitials.textContent = initials;
+          userInitials.style.display = "flex";
+          userAvatar.style.display = "none";
+        };
+        img.src = user.picture;
+        
+        // Show initials immediately as fallback while image loads
+        const name = user.name || user.email || "User";
+        const initials = name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase();
+        userInitials.textContent = initials;
+        userInitials.style.display = "flex";
+        userAvatar.style.display = "none";
       } else {
         // Show initials if no picture
         const name = user.name || user.email || "User";

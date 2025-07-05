@@ -126,46 +126,38 @@ export async function loginWithGoogle() {
 export async function checkLoginStatus() {
   console.log("Auth Util: Checking login status with backend...");
   try {
-    const response = await fetch(`${CONFIG.BACKEND_URL}/user`, {
-      method: "GET",
-      credentials: "include", // CRUCIAL: Browser sends existing session cookie
-    });
+    // Check both backend status and stored Google user info in parallel
+    const [backendResponse, storageResult] = await Promise.all([
+      fetch(`${CONFIG.BACKEND_URL}/user`, {
+        method: "GET",
+        credentials: "include", // CRUCIAL: Browser sends existing session cookie
+      }),
+      chrome.storage.local.get("googleUserInfo").catch(storageError => {
+        console.warn("Auth Util: Could not retrieve stored Google user info:", storageError);
+        return { googleUserInfo: null };
+      })
+    ]);
 
-    if (response.ok) {
-      const user = await response.json();
+    if (backendResponse.ok) {
+      const user = await backendResponse.json();
       console.log("Auth Util: User is logged in:", user);
 
-      // Try to get stored Google user info from extension storage
-      try {
-        const { googleUserInfo } = await chrome.storage.local.get(
-          "googleUserInfo"
-        );
-        if (googleUserInfo) {
-          console.log(
-            "Auth Util: Using stored Google user info:",
-            googleUserInfo
-          );
-          // Merge backend user data with stored Google info (Google info takes precedence for display)
-          return { ...user, ...googleUserInfo };
-        }
-      } catch (storageError) {
-        console.warn(
-          "Auth Util: Could not retrieve stored Google user info:",
-          storageError
-        );
+      // Use stored Google user info if available
+      const { googleUserInfo } = storageResult;
+      if (googleUserInfo) {
+        console.log("Auth Util: Using stored Google user info:", googleUserInfo);
+        // Merge backend user data with stored Google info (Google info takes precedence for display)
+        return { ...user, ...googleUserInfo };
       }
 
       return user; // Return user data from backend if no stored Google info
     } else {
-      console.log("Auth Util: Not logged in (status:", response.status, ")");
+      console.log("Auth Util: Not logged in (status:", backendResponse.status, ")");
       // Clear any stored user info if not logged in
       try {
         await chrome.storage.local.remove("googleUserInfo");
       } catch (storageError) {
-        console.warn(
-          "Auth Util: Could not clear stored Google user info:",
-          storageError
-        );
+        console.warn("Auth Util: Could not clear stored Google user info:", storageError);
       }
       return null; // Not logged in
     }
