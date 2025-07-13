@@ -291,7 +291,7 @@ function closeConfirmDialog(dialogElement) {
 }
 
 // Show confirmation dialog
-function showConfirmDialog(title, message, onConfirm) {
+function showConfirmDialog(title, message, onConfirm, onCancel = () => {}, confirmStyle = '', allowHTML = false) {
   const dialog = document.createElement("div");
   dialog.className = "modal-overlay";
 
@@ -304,7 +304,12 @@ function showConfirmDialog(title, message, onConfirm) {
 
   const messageEl = document.createElement("div");
   messageEl.className = "confirm-dialog-message";
-  messageEl.textContent = message;
+  
+  if (allowHTML) {
+    messageEl.innerHTML = message;
+  } else {
+    messageEl.textContent = message;
+  }
 
   const actions = document.createElement("div");
   actions.className = "confirm-dialog-actions";
@@ -313,15 +318,16 @@ function showConfirmDialog(title, message, onConfirm) {
   cancelBtn.className = "confirm-btn cancel";
   cancelBtn.textContent = "Cancel";
   cancelBtn.onclick = () => {
-    closeConfirmDialog(dialog); // Use helper
+    onCancel();
+    closeConfirmDialog(dialog);
   };
 
   const confirmBtn = document.createElement("button");
-  confirmBtn.className = "confirm-btn confirm";
-  confirmBtn.textContent = "Delete"; // Or make this configurable
+  confirmBtn.className = `confirm-btn confirm ${confirmStyle}`;
+  confirmBtn.textContent = confirmStyle === 'primary' ? "Import" : "Delete";
   confirmBtn.onclick = () => {
     onConfirm();
-    closeConfirmDialog(dialog); // Use helper
+    closeConfirmDialog(dialog);
   };
 
   actions.appendChild(cancelBtn);
@@ -333,19 +339,83 @@ function showConfirmDialog(title, message, onConfirm) {
 
   dialog.appendChild(content);
   document.body.appendChild(dialog);
-  document.body.classList.add("modal-open"); // Add class to body
+  document.body.classList.add("modal-open");
 
-  // Trigger the animation by adding 'active' class after a brief delay
   setTimeout(() => {
     dialog.classList.add("active");
   }, 10);
 
-  // Close on background click
   dialog.addEventListener("click", (e) => {
     if (e.target === dialog) {
-      closeConfirmDialog(dialog); // Use helper
+      onCancel();
+      closeConfirmDialog(dialog);
     }
   });
+}
+
+// Show a progress dialog with progress bar
+function showProgressDialog(title, message) {
+  const dialog = document.createElement('div');
+  dialog.className = 'modal-overlay active';
+
+  const content = document.createElement('div');
+  content.className = 'modal confirm-dialog-content';
+
+  const titleEl = document.createElement('div');
+  titleEl.className = 'confirm-dialog-title';
+  titleEl.textContent = title;
+
+  const messageEl = document.createElement('div');
+  messageEl.className = 'confirm-dialog-message';
+  messageEl.textContent = message;
+
+  // Progress bar container
+  const progressContainer = document.createElement('div');
+  progressContainer.className = 'progress-container';
+  
+  const progressBar = document.createElement('div');
+  progressBar.className = 'progress-bar';
+  progressBar.style.width = '0%';
+  
+  progressContainer.appendChild(progressBar);
+  
+  content.appendChild(titleEl);
+  content.appendChild(messageEl);
+  content.appendChild(progressContainer);
+  
+  dialog.appendChild(content);
+  document.body.appendChild(dialog);
+  document.body.classList.add('modal-open');
+
+  let progress = 0;
+  
+  // Start animating progress
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += (90 - progress) / 10;
+      progressBar.style.width = `${progress}%`;
+    }
+  }, 200);
+  
+  return {
+    updateProgress: (percent) => {
+      progress = percent;
+      progressBar.style.width = `${percent}%`;
+    },
+    complete: () => {
+      clearInterval(progressInterval);
+      progressBar.style.width = '100%';
+      
+      // Remove dialog after a short delay
+      setTimeout(() => {
+        dialog.classList.remove('active');
+        document.body.classList.remove('modal-open');
+        setTimeout(() => {
+          document.body.removeChild(dialog);
+        }, 300);
+      }, 500);
+    }
+  };
 }
 
 // Load current tabs
@@ -810,8 +880,289 @@ async function saveToWorkspace(name, isAddingToExisting) {
   }
 }
 
+// Function to export workspaces to JSON file
+async function exportWorkspaces() {
+  try {
+    const { workspaces = [] } = await chrome.storage.local.get('workspaces');
+    
+    if (workspaces.length === 0) {
+      showToast('No workspaces to export', 'warning');
+      return;
+    }
+
+    const exportData = {
+      version: '1.0.0',
+      exportDate: new Date().toISOString(),
+      workspaceCount: workspaces.length,
+      workspaces: workspaces
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `tabrecall-workspaces-${new Date().toISOString().split('T')[0]}.json`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    URL.revokeObjectURL(url);
+    
+    showToast(`${workspaces.length} workspaces exported successfully!`, 'success');
+  } catch (error) {
+    console.error('Export failed:', error);
+    showToast('Failed to export workspaces', 'error');
+  }
+}
+
+// Function to import workspaces from JSON file
+async function importWorkspaces(file) {
+  try {
+    if (!file) {
+      showToast('No file selected', 'warning');
+      return;
+    }
+
+    if (!file.name.endsWith('.json')) {
+      showToast('Please select a valid JSON file', 'error');
+      return;
+    }
+
+    const fileContent = await readFileAsText(file);
+    const importData = JSON.parse(fileContent);
+    
+    // Validate import data structure
+    if (!importData.workspaces || !Array.isArray(importData.workspaces)) {
+      throw new Error('Invalid backup file format');
+    }
+
+    const { workspaces: existingWorkspaces = [] } = await chrome.storage.local.get('workspaces');
+    const existingNames = new Set(existingWorkspaces.map(w => w.name.toLowerCase()));
+    
+    let importedCount = 0;
+    let skippedCount = 0;
+    const workspacesToAdd = [];
+
+    // Process each workspace
+    for (const workspace of importData.workspaces) {
+      // Validate workspace structure
+      if (!workspace.id || !workspace.name || !workspace.tabs) {
+        console.warn('Skipping invalid workspace:', workspace);
+        skippedCount++;
+        continue;
+      }
+
+      // Handle duplicates
+      if (existingNames.has(workspace.name.toLowerCase())) {
+        // Rename duplicate
+        let counter = 1;
+        let newName = `${workspace.name} (${counter})`;
+        while (existingNames.has(newName.toLowerCase())) {
+          counter++;
+          newName = `${workspace.name} (${counter})`;
+        }
+        workspace.name = newName;
+        existingNames.add(newName.toLowerCase());
+      }
+
+      // Generate new ID to avoid conflicts
+      workspace.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+      workspacesToAdd.push(workspace);
+      importedCount++;
+    }
+
+    if (workspacesToAdd.length === 0) {
+      showToast('No valid workspaces found in file', 'warning');
+      return;
+    }
+
+    // Show import preview and confirm
+    const confirmed = await showImportPreview(importData);
+    if (!confirmed) {
+      showToast('Import cancelled', 'info');
+      return;
+    }
+
+    // Show progress for large imports
+    let progressDialog;
+    if (workspacesToAdd.length > 10) {
+      progressDialog = showProgressDialog('Importing workspaces...', 
+        `Processing ${workspacesToAdd.length} workspaces`);
+    }
+
+    // Save imported workspaces
+    const updatedWorkspaces = [...existingWorkspaces, ...workspacesToAdd];
+    await chrome.storage.local.set({ workspaces: updatedWorkspaces });
+    
+    // Close progress dialog if it exists
+    if (progressDialog) {
+      progressDialog.complete();
+    }
+    
+    // Refresh UI
+    await loadSavedWorkspaces();
+    
+    const message = skippedCount > 0 
+      ? `Imported ${importedCount} workspaces (${skippedCount} skipped)`
+      : `Successfully imported ${importedCount} workspaces!`;
+    
+    showToast(message, 'success');
+    
+  } catch (error) {
+    console.error('Import failed:', error);
+    showToast(`Import failed: ${error.message}`, 'error');
+  }
+}
+
+// Helper function to read file as text
+function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = (e) => reject(new Error('Failed to read file'));
+    reader.readAsText(file);
+  });
+}
+
+// Show a preview of the import data and ask for confirmation
+async function showImportPreview(importData) {
+  return new Promise((resolve) => {
+    const workspaceCount = importData.workspaces.length;
+    const exportDate = importData.exportDate ? 
+      new Date(importData.exportDate).toLocaleDateString() : 
+      'unknown date';
+    
+    // Calculate total tabs being imported
+    const totalTabs = importData.workspaces.reduce((count, workspace) => 
+      count + (workspace.tabs?.length || 0), 0);
+    
+    // Calculate unique domains
+    const domains = new Set();
+    const topWorkspaces = [];
+
+    importData.workspaces.forEach(workspace => {
+      // Collect top 3 workspaces info for preview
+      if (topWorkspaces.length < 3) {
+        topWorkspaces.push({
+          name: workspace.name,
+          tabCount: workspace.tabs?.length || 0
+        });
+      }
+      
+      workspace.tabs?.forEach(tab => {
+        try {
+          domains.add(new URL(tab.url).hostname);
+        } catch {
+          // Ignore invalid URLs
+        }
+      });
+    });
+    
+    // Format workspace preview text
+    const workspacePreview = topWorkspaces.map(w => 
+      `• ${w.name} (${w.tabCount} tabs)`
+    ).join('<br>');
+    
+    const previewMessage = `
+      <div class="import-preview">
+        <p>This will import <strong>${workspaceCount} workspaces</strong> containing <strong>${totalTabs} tabs</strong> across <strong>${domains.size} domains</strong> from ${exportDate}.</p>
+        ${topWorkspaces.length > 0 ? `<p>Preview of workspaces:<br>${workspacePreview}${workspaceCount > 3 ? '<br>• ...' : ''}</p>` : ''}
+        <p>Duplicates will be renamed automatically.</p>
+      </div>
+    `;
+    
+    // Use HTML in confirm dialog
+    showConfirmDialog(
+      'Import Workspaces',
+      previewMessage,
+      () => resolve(true),
+      () => resolve(false),
+      'primary', // Use primary style for the confirm button
+      true // Enable HTML in the message
+    );
+  });
+}
+
+// The workspaces header is defined directly in the HTML
+
 // Setup event listeners
 function setupEventListeners() {
+  // Import/Export dropdown functionality
+  const backupBtn = document.getElementById('backup-btn');
+  const backupDropdown = document.getElementById('backup-dropdown');
+  const importBtn = document.getElementById('import-btn');
+  const exportBtn = document.getElementById('export-btn');
+  const fileInput = document.getElementById('import-file-input');
+  
+  // Toggle dropdown on click
+  backupBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    backupDropdown.classList.toggle('show');
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.import-export-container')) {
+      backupDropdown.classList.remove('show');
+    }
+  });
+
+  // Import handler with focus management
+  importBtn.addEventListener('click', () => {
+    backupDropdown.classList.remove('show');
+    fileInput.click();
+  });
+
+  // Export handler with loading state
+  exportBtn.addEventListener('click', async () => {
+    backupDropdown.classList.remove('show');
+    
+    // Show loading state
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = '<span class="loading-icon"></span> Exporting...';
+    exportBtn.disabled = true;
+    
+    try {
+      await exportWorkspaces();
+    } finally {
+      // Restore button state
+      setTimeout(() => {
+        exportBtn.innerHTML = originalText;
+        exportBtn.disabled = false;
+      }, 500); // Small delay to ensure user sees the completion
+    }
+  });
+
+  // Enhanced file input handler with validation feedback and loading state
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Show loading indicator
+      showToast('Processing import file...', 'default');
+      
+      // Show loading state on import button
+      const originalText = importBtn.innerHTML;
+      importBtn.innerHTML = '<span class="loading-icon"></span> Importing...';
+      importBtn.disabled = true;
+      
+      try {
+        await importWorkspaces(file);
+      } catch (error) {
+        showToast(`Import error: ${error.message}`, 'error');
+      } finally {
+        // Reset UI state
+        setTimeout(() => {
+          importBtn.innerHTML = originalText;
+          importBtn.disabled = false;
+        }, 500);
+        e.target.value = ''; // Reset file input
+      }
+    }
+  });
+
   // Search workspaces
   document
     .getElementById("search-workspaces")
@@ -837,6 +1188,7 @@ function setupEventListeners() {
         container.appendChild(workspaceElement);
       });
     });
+
   // Workspace actions with confirmation for delete
   document
     .getElementById("workspaces-container")
@@ -976,19 +1328,9 @@ function setupEventListeners() {
               }
             }
           );
-        } else if (e.target.classList.contains("open-workspace")) {
-          const { workspaces = [] } = await chrome.storage.local.get(
-            "workspaces"
-          );
-          const workspace = workspaces.find((w) => w.id === workspaceId);
-
-          if (workspace) {
-            showToast(`Opening ${workspace.name}...`, "default");
-            chrome.windows.create({
-              url: workspace.tabs.map((tab) => tab.url),
-            });
-          }
         }
       }
     });
 }
+
+// The workspaces header is already defined in the HTML, no need to create it dynamically

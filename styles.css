@@ -1266,8 +1266,213 @@ input[type="checkbox"]:checked::after {
   cursor: pointer;
   font-weight: 500;
   white-space: nowrap;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .secondary-btn:hover {
   background-color: var(--secondary-button-hover-bg);
+  border-color: var(--primary-color);
+}
+
+/* Import/Export Functionality Styles */
+.import-export-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+.backup-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.dropdown-icon {
+  transition: transform 0.2s ease;
+}
+
+.backup-dropdown-btn:hover .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+.backup-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0; /* Align to right side */
+  background: var(--card-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  z-index: 1000;
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+/* Show dropdown when hovering the button or dropdown */
+.import-export-container:hover .backup-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.backup-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background-color: var(--hover-bg);
+}
+
+.dropdown-item:first-child {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-item:last-child {
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+/* Style for the file input (hidden) */
+#import-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Loading icon for the import/export buttons */
+.loading-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Disable button style during loading */
+.dropdown-item:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Adjust workspaces header for layout */
+.workspaces-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.search-bar {
+  flex: 1;
+  margin-bottom: 0;
+  margin-right: 0.5rem;
+}
+
+/* Import preview styling */
+.import-preview {
+  text-align: left;
+  line-height: 1.5;
+}
+
+.import-preview p {
+  margin-bottom: 1rem;
+}
+
+.import-preview strong {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Progress bar for import/export operations */
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background: var(--input-bg-color);
+  border-radius: 3px;
+  margin: 0.75rem 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.light-theme .progress-bar {
+  background: var(--primary-color);
+}
+
+/* Import stats summary */
+.import-stats {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.import-stat {
+  background: var(--card-bg-lighter);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  flex: 1;
+}
+
+.import-stat-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.25rem;
+}
+
+.import-stat-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary-color);
+}
+
+.light-theme .import-stat {
+  background: var(--light-input-bg-color);
+}
+
+.light-theme .import-stat-value {
+  color: var(--primary-color);
+}
+
+.light-theme .import-stat-label {
+  color: var(--light-text-secondary-color);
 }
